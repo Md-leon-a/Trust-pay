@@ -1,0 +1,27 @@
+CREATE DATABASE IF NOT EXISTS trustpay;
+USE trustpay;
+
+CREATE TABLE IF NOT EXISTS users (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  full_name VARCHAR(100) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  pin_hash VARCHAR(255) NOT NULL,
+  balance DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_users_phone (phone)
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id BIGINT UNSIGNED NOT NULL,
+  type ENUM('add_money','cashout','transfer_in','transfer_out') NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  reference_phone VARCHAR(20) NULL,
+  note VARCHAR(255) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_transactions_user_id (user_id),
+  CONSTRAINT fk_transactions_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
