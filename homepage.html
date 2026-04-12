@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrustPay</title>
+  <link rel="shortcut icon" href="./assets/logo.png" type="image/x-icon">
+
+  <!-- tailwind + daisy Ui -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- font  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+
+  <!-- icon  -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+  <style>
+    * {
+      font-family: "Outfit", sans-serif;
+      
+    }
+    .Active{
+
+      background-color: #4A00FF;
+      color: white;
+    }
+    .Remove{
+
+      background-color: white;
+      color:#4A00FF
+    }
+
+
+
+  </style>
+
+</head>
+
+<body class="w-11/12   sm:w-11/12 md:w-5/12  shadow-xl    bg-base-200 mx-auto border-1 border-gray-300 lg:my-30 pb-10">
+
+ <header class="border-b-1 border-gray-200 sticky top-0 z-10  ">
+<section class="container mx-auto bg-white shadow-inner ">
+    <div class="w-11/12 mx-auto py-3 flex justify-between items-center sticky">
+   <div class="left flex gap-2"> 
+       <div class="logo w-[60px]"><img src="./assets/logo.png" alt=""></div>
+       <div class="balance-info ">
+        <h2 class="text-2xl font-extrabold"><span>&#2547;</span><span id="currentBalance" > 45000</span></h2>
+        <p class="text-neutral/50">Available Balance</p>
+       </div>
+
+   </div> 
+<div class="right">
+ <a id="logout-link" href="./index.html" class="btn btn-neutral btn-soft text-neutral/50 hover:bg-pink-400"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log Out</a>
+</div>
+</div>
+</section>
+
+ </header>
+
+<section class="container mx-auto bg-white">
+
+<div class="w-11/12   sm:w-11/12 mx-auto py-10 space-y-5">
+   <h2 class="text-3xl font-bold text-center">Welcome to Trust<span class="text-primary">Pay</span> </h2>
+   <p class="text-neutral/50 text-center">Enjoy easy and hassle free financial services with us. Cashout charge is low   </p>
+   <p id="guest-mode-notice" class="hidden text-warning text-center font-medium">Guest mode: You can tour the home page, but you need an account to use services.</p>
+
+     <div class="button grid grid-cols-3 gap-5">
+
+              <!--Leon's  Part start -->
+            <button id="addBtn" onclick="buttonToggle('addBtn')" class="btn flex-col h-full py-5 bg-white text-[#4A00FF] hover:bg-[#4A00FF] hover:text-white   rounded-[20px]  border-gray-200 ">
+                <img src="./assets/opt-1.png" alt="">
+                <p>Add Money</p>
+            </button>
+            <button id="cashoutBtn" onclick="buttonToggle('cashoutBtn')" class="btn flex-col h-full   bg-white text-[#4A00FF] hover:bg-[#4A00FF] hover:text-white  rounded-[20px]  border-gray-200 ">
+                <img src="./assets/opt-2.png" alt="">
+                <p>Cashout</p>
+            </button>
+            <button id="TransferBtn" onclick="buttonToggle('TransferBtn')" class="btn flex-col h-full  bg-white text-[#4A00FF] hover:bg-[#4A00FF] hover:text-white  rounded-[20px]  border-gray-200 ">
+                <img src="./assets/opt-3.png" alt="">
+                <p>Transfer Money</p>
+            </button>
+            <!-- ------ Leon's part  Ends here----------- -->
+
+
+
+
+            <!-- --------FAHIM parts start --------------- -->
+            <button id="getBtn" onclick="buttonToggle('getBtn')" class="btn flex-col h-full py-5   bg-white text-[#4A00FF] hover:bg-[#4A00FF] hover:text-white  rounded-[20px]  border-gray-200 ">
+                <img src="./assets/opt-4.png" alt="">
+                <p>Get Bonus</p>
+            </button>
+            <button id="payBtn" onclick="buttonToggle('payBtn')" class="btn flex-col h-full    bg-white text-[#4A00FF] hover:bg-[#4A00FF] hover:text-white  rounded-[20px]  border-gray-200 ">
+                <img src="./assets/opt-5.png" alt="">
+                <p>Pay Bill</p>
+            </button>
+            <button id="transactionBtn" onclick="buttonToggle('transactionBtn')" class="btn flex-col h-full  bg-white text-[#4A00FF] hover:bg-[#4A00FF] hover:text-white  rounded-[20px]  border-gray-200 ">
+                <img src="./assets/opt-6.png" alt="">
+                <p>Transactions</p>
+            </button>
+             <!-- -----------Fahim's part Ends here  ------ -->
+
+
+
+
+     </div>
+
+ </div>
+
+  
+
+
+
+</section>
+ 
+
+
+
+ 
+
+ 
+
+  <div id="cashOut" class="form pt-8 ">
+    <p class="w-full  px-2     md:w-11/12 mx-auto  font-bold py-2 ">Cash Out</p>
+    <div class="card bg-base-100 w-11/12 mx-auto  shrink-0 shadow rounded-2xl   ">
+      <div class="card-body">
+        <fieldset class="fieldset">
+          <label class=" label text-neutral font-bold py-2">Agent Number</label>
+          <input id="cashout-agent" maxlength="11" minlength="11" type="text"
+            class="input bg-base-200 rounded-full w-full border-0" placeholder="Enter your number"  /> <br>
+
+          <label class="label text-neutral font-bold py-2">Amount</label>
+          <input id="cashout-amount" type="text"
+            class="input bg-base-200 rounded-full w-full border-0" placeholder="Enter amount to withdraw"  /> <br>
+
+          <label class="label text-neutral font-bold py-2 ">Pin Number</label>
+          <input id="cashout-pin" maxlength="4" minlength="4" type="password"
+            class="input bg-base-200 rounded-full w-full border-0" placeholder="Enter 4 digit pin number" />
+
+
+          <button id="cashout-btn" class="btn btn-primary mt-4 rounded-full w-full ">Withdraw  Money</button>
+        </fieldset>
+      </div>
+    </div>
+
+
+  
+   </div>
+
+  <div id="addMoney" class="form pt-8 ">
+    <p class="w-full px-2     md:w-11/12 mx-auto  font-bold py-2">Add Money</p>
+    <div class="card bg-base-100 w-11/12 mx-auto  shrink-0 shadow rounded-2xl   ">
+      <div class="card-body">
+        <fieldset class="fieldset">
+           <label for="bank" class=" label text-neutral font-bold py-2" >Select Bank</label>
+           <select name="bank" id="bank"  class="py-2 gray px-2 bg-base-200 rounded-full w-full border-1 border-gray-300" >
+
+            <option value="">Click here to select a Bank</option>
+            <option value="">Sonali Bank</option>
+            <option value="">Social Bank</option>
+            <option value="">Brac Bank</option>
+           </select>
+
+
+
+          <label class=" label text-neutral font-bold py-2">Bank Account Number</label>
+          <input id="addmoney-account" maxlength="11" minlength="11" type="text"
+            class="input bg-base-200 rounded-full w-full border-0" placeholder="Enter your bank account number"  /> <br>
+
+          <label class="label text-neutral font-bold py-2">Amount to Add</label>
+          <input id="addmoney-amount" type="text"
+            class="input bg-base-200 rounded-full w-full border-0" placeholder="Enter amount to add"  /> <br>
+
+          <label class="label text-neutral font-bold py-2 ">Pin Number</label>
+          <input id="addmoney-pin" maxlength="4" minlength="4" type="password"
+            class="input bg-base-200 rounded-full w-full border-0" placeholder="Enter 4 digit pin number" />
+
+
+          <button id="addmoney-btn" class="btn btn-accent text-white mt-4 rounded-full w-full ">Add Money</button>
+        </fieldset>
+      </div>
+    </div>
+
+  </div>
+
+
+
+     <div id="Transfer" class="form pt-8 ">
+    <p class="w-full  px-2     md:w-11/12 mx-auto  font-bold py-2 ">Transfer Money</p>
+    <div class="card bg-base-100 w-11/12 mx-auto  shrink-0 shadow rounded-2xl   ">
+      <div class="card-body">
+        <fieldset class="fieldset">
+          <label class=" label text-neutral font-bold py-2">User Account Number</label>
+          <input id="transfer-receiver" maxlength="11" minlength="11" type="text"
+            class="input bg-base-200 rounded-full w-full border-0" placeholder="Enter user account number number" /> <br>
+
+          <label class="label text-neutral font-bold py-2">Amount</label>
+          <input id="transfer-amount" type="text"
+            class="input bg-base-200 rounded-full w-full border-0" placeholder="Enter amount to transfer"  /> <br>
+
+          <label class="label text-neutral font-bold py-2 ">Pin Number</label>
+          <input id="transfer-pin" maxlength="4" minlength="4" type="password"
+            class="input bg-base-200 rounded-full w-full border-0" placeholder="Enter 4 digit pin number" />
+
+
+          <button id="transfer-btn" class="btn btn-error text-white mt-4 rounded-full w-full ">Transfer  Money</button>
+        </fieldset>
+      </div>
+    </div>
+
+
+  
+   </div>
+     <div id="default" class="form pt-8 ">
+
+  
+   </div>
+
+
+
+
+
+
+
+
+
+ <script src="./Javascript/homepage.js"></script>
+</body>
+
+</html>

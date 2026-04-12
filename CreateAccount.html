@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustPay</title>
+    <link rel="shortcut icon" href="./assets/logo.png" type="image/x-icon">
+
+  <!-- tailwind+DaisyUI+CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> 
+     <link rel="stylesheet" href="./style/style.css">
+    
+  <!-- font   -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+
+
+</head>
+<body class=" md:bg-[#F8FAFC]">
+
+<Section class="loginPage " >
+<div class="bg-padding min-h-dvh lg:px-0 py-0 md:py-7   flex items-stretch">
+
+  
+<div class="login w-full min-h-dvh    md:min-h-0 sm:w-8/12 md:w-9/12 lg:w-5/12 mx-auto bg-[#FFFFFF] border-[#E4E4E7] shadow-xl flex flex-col justify-around rounded-md items-center">
+
+<div class=" w-11/12 mx-auto flex flex-col  items-center">
+    <img src="./assets/TrustPay.png"    alt="" class="mb-6 mt-8">
+   
+</div>
+<div class="w-11/12 mx-auto flex flex-col mt-6  ">
+ <p class="font-bold text-center text-3xl">Create Account</p>
+<label class="font-medium mb-1">User Name</label>
+<input id="signup-name"  type="text"   class="py-2 px-2 border-gray-200 rounded-md mb-3 " placeholder="Enter your name"  >
+
+
+<label class="font-medium mb-1">Phone Number</label>
+<input id="signup-phone"  type="text" maxlength="11" minlength="11"  class="py-2 px-2 border-gray-200 rounded-md " placeholder="Enter Phone Number"  >
+
+<label class="font-medium mt-4 mb-1">PIN</label>
+<input id="signup-pin" type="password" maxlength="4" minlength="4"  class="py-2 px-2 border-gray-200 rounded-md " placeholder="Enter 4 digit PIN">
+
+
+
+
+</div>
+
+<div class="sign-btn w-8/12 mx-auto  rounded-md ">
+  <button id="signup-btn" class="btn  btn-secondary w-full">Sign Up</button>
+   
+  
+
+    
+</div>
+
+
+
+
+
+</div>
+</div>
+
+
+
+
+</Section>
+
+
+
+  <script src="./Javascript/createAccount.js"></script> 
+</body>
+</html>
