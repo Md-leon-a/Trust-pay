@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS transactions (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id BIGINT UNSIGNED NOT NULL,
-  type ENUM('add_money','cashout','transfer_in','transfer_out') NOT NULL,
+  type ENUM('add_money','cashout','transfer_in','transfer_out','bonus','bill_pay') NOT NULL,
   amount DECIMAL(12,2) NOT NULL,
   reference_phone VARCHAR(20) NULL,
   note VARCHAR(255) NULL,
