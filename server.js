@@ -95,7 +95,7 @@ async function initDatabase() {
     CREATE TABLE IF NOT EXISTS transactions (
       id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
       user_id BIGINT UNSIGNED NOT NULL,
-      type ENUM('add_money','cashout','transfer_in','transfer_out') NOT NULL,
+      type ENUM('add_money','cashout','transfer_in','transfer_out','bonus','bill_pay') NOT NULL,
       amount DECIMAL(12,2) NOT NULL,
       reference_phone VARCHAR(20) NULL,
       note VARCHAR(255) NULL,
@@ -104,6 +104,11 @@ async function initDatabase() {
       KEY idx_transactions_user_id (user_id),
       CONSTRAINT fk_transactions_user FOREIGN KEY (user_id) REFERENCES users(id)
     )
+  `);
+
+  await pool.execute(`
+    ALTER TABLE transactions
+    MODIFY COLUMN type ENUM('add_money','cashout','transfer_in','transfer_out','bonus','bill_pay') NOT NULL
   `);
 }
 
@@ -124,6 +129,12 @@ function parseAmount(value) {
   if (!Number.isFinite(amount)) return null;
   if (amount <= 0) return null;
   return Number(amount.toFixed(2));
+}
+
+const validBillTypes = new Set(['electricity', 'gas', 'water', 'internet', 'phone']);
+
+function validBillType(billType) {
+  return validBillTypes.has(String(billType || '').trim().toLowerCase());
 }
 
 app.post('/api/auth/register', async (req, res) => {
@@ -484,6 +495,184 @@ app.post('/api/transactions/transfer', async (req, res) => {
     return res.status(500).json({ message: 'Failed to transfer money.' });
   } finally {
     connection.release();
+  }
+});
+
+app.post('/api/transactions/get-bonus', async (req, res) => {
+  const connection = await pool.getConnection();
+  try {
+    const userId = Number(req.body.userId);
+    const bonusCode = String(req.body.bonusCode || '').trim();
+    const pin = String(req.body.pin || '').trim();
+    const bonusAmount = 500;
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(400).json({ message: 'Invalid user ID.' });
+    }
+    if (bonusCode.length < 6) {
+      return res.status(400).json({ message: 'Bonus code must be at least 6 characters.' });
+    }
+    if (!validPin(pin)) {
+      return res.status(400).json({ message: 'PIN must be exactly 4 digits.' });
+    }
+
+    await connection.beginTransaction();
+
+    const [rows] = await connection.execute(
+      'SELECT id, pin_hash FROM users WHERE id = ? FOR UPDATE',
+      [userId]
+    );
+
+    if (!rows.length) {
+      await connection.rollback();
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const user = rows[0];
+    const pinMatch = await bcrypt.compare(pin, user.pin_hash);
+    if (!pinMatch) {
+      await connection.rollback();
+      return res.status(401).json({ message: 'Wrong PIN.' });
+    }
+
+    await connection.execute(
+      'UPDATE users SET balance = balance + ? WHERE id = ?',
+      [bonusAmount, userId]
+    );
+
+    await connection.execute(
+      'INSERT INTO transactions (user_id, type, amount, note) VALUES (?, ?, ?, ?)',
+      [userId, 'bonus', bonusAmount, `Bonus code redeemed: ${bonusCode}`]
+    );
+
+    const [updatedRows] = await connection.execute(
+      'SELECT balance FROM users WHERE id = ?',
+      [userId]
+    );
+
+    await connection.commit();
+
+    return res.json({
+      message: 'Bonus added successfully.',
+      balance: Number(updatedRows[0].balance)
+    });
+  } catch (error) {
+    await connection.rollback();
+    console.error('Get bonus error:', error);
+    return res.status(500).json({ message: 'Failed to add bonus.' });
+  } finally {
+    connection.release();
+  }
+});
+
+app.post('/api/transactions/pay-bill', async (req, res) => {
+  const connection = await pool.getConnection();
+  try {
+    const userId = Number(req.body.userId);
+    const billType = String(req.body.billType || '').trim().toLowerCase();
+    const billNumber = String(req.body.billNumber || '').trim();
+    const amount = parseAmount(req.body.amount);
+    const pin = String(req.body.pin || '').trim();
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(400).json({ message: 'Invalid user ID.' });
+    }
+    if (!validBillType(billType)) {
+      return res.status(400).json({ message: 'Invalid bill type.' });
+    }
+    if (billNumber.length < 6 || billNumber.length > 20) {
+      return res.status(400).json({ message: 'Bill number must be between 6 and 20 characters.' });
+    }
+    if (!amount) {
+      return res.status(400).json({ message: 'Amount must be greater than 0.' });
+    }
+    if (!validPin(pin)) {
+      return res.status(400).json({ message: 'PIN must be exactly 4 digits.' });
+    }
+
+    await connection.beginTransaction();
+
+    const [rows] = await connection.execute(
+      'SELECT id, pin_hash, balance FROM users WHERE id = ? FOR UPDATE',
+      [userId]
+    );
+
+    if (!rows.length) {
+      await connection.rollback();
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const user = rows[0];
+    const pinMatch = await bcrypt.compare(pin, user.pin_hash);
+    if (!pinMatch) {
+      await connection.rollback();
+      return res.status(401).json({ message: 'Wrong PIN.' });
+    }
+
+    if (Number(user.balance) < amount) {
+      await connection.rollback();
+      return res.status(400).json({ message: 'Insufficient balance.' });
+    }
+
+    await connection.execute(
+      'UPDATE users SET balance = balance - ? WHERE id = ?',
+      [amount, userId]
+    );
+
+    await connection.execute(
+      'INSERT INTO transactions (user_id, type, amount, reference_phone, note) VALUES (?, ?, ?, ?, ?)',
+      [userId, 'bill_pay', amount, billNumber, `Paid ${billType} bill`]
+    );
+
+    const [updatedRows] = await connection.execute(
+      'SELECT balance FROM users WHERE id = ?',
+      [userId]
+    );
+
+    await connection.commit();
+
+    return res.json({
+      message: 'Bill paid successfully.',
+      balance: Number(updatedRows[0].balance)
+    });
+  } catch (error) {
+    await connection.rollback();
+    console.error('Pay bill error:', error);
+    return res.status(500).json({ message: 'Failed to pay bill.' });
+  } finally {
+    connection.release();
+  }
+});
+
+app.get('/api/transactions/:userId', async (req, res) => {
+  try {
+    const userId = Number(req.params.userId);
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(400).json({ message: 'Invalid user ID.' });
+    }
+
+    const [rows] = await pool.execute(
+      `SELECT id, type, amount, reference_phone AS referencePhone, note, created_at AS createdAt
+       FROM transactions
+       WHERE user_id = ?
+       ORDER BY created_at DESC, id DESC
+       LIMIT 100`,
+      [userId]
+    );
+
+    return res.json({
+      transactions: rows.map((row) => ({
+        id: row.id,
+        type: row.type,
+        amount: Number(row.amount),
+        referencePhone: row.referencePhone,
+        note: row.note,
+        createdAt: row.createdAt
+      }))
+    });
+  } catch (error) {
+    console.error('Get transactions error:', error);
+    return res.status(500).json({ message: 'Failed to fetch transactions.' });
   }
 });
 
