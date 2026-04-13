@@ -68,6 +68,19 @@ function setBalance(balance) {
   balanceEl.innerText = Number(balance).toFixed(2);
 }
 
+function setUserName(user) {
+  const userName = document.getElementById('currentUserName');
+  if (!userName) return;
+
+  if (!user) {
+    userName.innerText = 'User: -';
+    return;
+  }
+
+  const displayName = (user.fullName || '').trim() || (isGuestUser(user) ? 'Guest User' : 'User');
+  userName.innerText = `User: ${displayName}`;
+}
+
 async function refreshBalance() {
   const user = getCurrentUser();
   if (!user || !user.id) return;
@@ -102,6 +115,7 @@ function initUser() {
     window.location.assign('./index.html');
     return;
   }
+  setUserName(user);
   if (isGuestUser(user)) {
     setBalance(0);
     const guestNotice = document.getElementById('guest-mode-notice');
